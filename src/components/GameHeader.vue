@@ -3,12 +3,17 @@
     <div class="header-left">
       <button class="btn ghost" @click="$emit('back')">← 存档</button>
       <h2>第 {{ state.day }} 天</h2>
-      <span class="days-left">剩余 {{ daysLeft }} 天</span>
+      <span class="days-left" :class="daysLeftClass">
+        剩余 {{ daysLeft }} 天
+      </span>
     </div>
     <div class="header-stats">
       <div class="stat-item">
         <span class="label">资金</span>
-        <span class="value" :class="{ danger: state.money < 10000 }">
+        <span
+          class="value"
+          :class="moneyClass"
+        >
           ¥{{ state.money.toLocaleString() }}
         </span>
       </div>
@@ -18,13 +23,21 @@
       </div>
       <div class="stat-item">
         <span class="label">盈利</span>
-        <span class="value" :class="profit >= 0 ? 'success' : 'danger'">
-          ¥{{ profit.toLocaleString() }}
+        <span
+          class="value"
+          :class="profit >= 0 ? 'text-success' : 'text-danger'"
+        >
+          {{ profit >= 0 ? '+' : '' }}¥{{ profit.toLocaleString() }}
         </span>
       </div>
       <div class="stat-item">
         <span class="label">出道</span>
-        <span class="value">{{ state.groups.length }}/{{ targetGroups }}</span>
+        <span
+          class="value"
+          :class="{ 'text-accent': state.groups.length >= targetGroups }"
+        >
+          {{ state.groups.length }}/{{ targetGroups }}
+        </span>
       </div>
     </div>
     <button class="theme-btn" @click="$emit('toggle-theme')">
@@ -34,9 +47,10 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { GAME_CONFIG } from '../config/gameConfig'
 
-defineProps({
+const props = defineProps({
   state: Object,
   daysLeft: Number,
   profit: Number,
@@ -45,6 +59,18 @@ defineProps({
 defineEmits(['back', 'toggle-theme'])
 
 const targetGroups = GAME_CONFIG.victory.targetGroups
+
+const daysLeftClass = computed(() => {
+  if (props.daysLeft <= 30) return 'text-danger glow-danger'
+  if (props.daysLeft <= 90) return 'text-warning'
+  return ''
+})
+
+const moneyClass = computed(() => {
+  if (props.state.money < 5000) return 'text-danger glow-danger'
+  if (props.state.money < 20000) return 'text-warning'
+  return ''
+})
 </script>
 
 <style scoped>
@@ -72,6 +98,19 @@ const targetGroups = GAME_CONFIG.victory.targetGroups
 .days-left {
   font-size: 0.85rem;
   color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.days-left.text-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  animation: pulse-danger 2s infinite;
+}
+
+.days-left.text-warning {
+  background: var(--warning-soft);
+  color: var(--warning);
 }
 
 .header-stats {
@@ -94,10 +133,26 @@ const targetGroups = GAME_CONFIG.victory.targetGroups
 .stat-item .value {
   font-weight: 700;
   font-size: 1rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
 }
 
-.stat-item .value.success { color: var(--success); }
-.stat-item .value.danger { color: var(--danger); }
+.stat-item .value.text-danger {
+  background: var(--danger-soft);
+}
+
+.stat-item .value.text-warning {
+  background: var(--warning-soft);
+}
+
+.stat-item .value.text-success {
+  background: var(--success-soft);
+}
+
+.stat-item .value.text-accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 
 .theme-btn {
   background: var(--bg-secondary);
@@ -107,5 +162,20 @@ const targetGroups = GAME_CONFIG.victory.targetGroups
   height: 40px;
   cursor: pointer;
   font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.theme-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@keyframes pulse-danger {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--danger-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
 }
 </style>

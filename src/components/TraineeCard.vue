@@ -8,25 +8,29 @@
     <div class="bars">
       <div class="bar-row">
         <span>疲劳</span>
-        <div class="bar"><div class="fill fatigue" :style="{ width: trainee.fatigue + '%' }"></div></div>
-        <span>{{ trainee.fatigue }}</span>
+        <div class="bar" :class="fatigueBarClass">
+          <div class="fill" :class="fatigueFillClass" :style="{ width: trainee.fatigue + '%' }"></div>
+        </div>
+        <span :class="fatigueTextClass">{{ trainee.fatigue }}</span>
       </div>
       <div class="bar-row">
         <span>压力</span>
-        <div class="bar"><div class="fill stress" :style="{ width: trainee.stress + '%' }"></div></div>
-        <span>{{ trainee.stress }}</span>
+        <div class="bar" :class="stressBarClass">
+          <div class="fill" :class="stressFillClass" :style="{ width: trainee.stress + '%' }"></div>
+        </div>
+        <span :class="stressTextClass">{{ trainee.stress }}</span>
       </div>
     </div>
 
     <div class="stats-grid">
-      <div v-for="key in statKeys" :key="key" class="stat-cell">
+      <div v-for="key in statKeys" :key="key" class="stat-cell" :class="{ 'stat-highlight': trainee.stats[key] >= 80 }">
         <span class="stat-label">{{ statLabels[key] }}</span>
         <span class="stat-val">{{ trainee.stats[key] }}</span>
       </div>
     </div>
 
     <div v-if="score !== null" class="score">
-      综合评分 <strong>{{ score }}</strong>
+      综合评分 <strong :class="{ 'text-accent': score >= debutThreshold }">{{ score }}</strong>
       <span v-if="trainee.status === 'trainee'" class="debut-hint">
         {{ score >= debutThreshold ? '✓ 可出道' : `需 ${debutThreshold}` }}
       </span>
@@ -49,6 +53,7 @@ const props = defineProps({
 const statKeys = GAME_CONFIG.stats
 const statLabels = GAME_CONFIG.statLabels
 const debutThreshold = GAME_CONFIG.rating.debutScoreThreshold
+const { fatigueExhausted, stressHigh, stressBreakdown } = GAME_CONFIG.thresholds
 
 const statusLabel = computed(() => {
   const map = { trainee: '练习生', debuted: '已出道', left: '已离开' }
@@ -60,17 +65,63 @@ const statusClass = computed(() => ({
   left: props.trainee.status === 'left',
   ill: props.trainee.illnessDays > 0,
 }))
+
+const fatigueBarClass = computed(() => {
+  if (props.trainee.fatigue >= fatigueExhausted) return 'bar-danger'
+  if (props.trainee.fatigue >= 50) return 'bar-warning'
+  return ''
+})
+
+const fatigueFillClass = computed(() => {
+  if (props.trainee.fatigue >= fatigueExhausted) return 'fill-danger'
+  if (props.trainee.fatigue >= 50) return 'fill-warning'
+  return 'fill-fatigue'
+})
+
+const fatigueTextClass = computed(() => {
+  if (props.trainee.fatigue >= fatigueExhausted) return 'text-danger'
+  if (props.trainee.fatigue >= 50) return 'text-warning'
+  return ''
+})
+
+const stressBarClass = computed(() => {
+  if (props.trainee.stress >= stressBreakdown) return 'bar-danger glow-danger'
+  if (props.trainee.stress >= stressHigh) return 'bar-warning'
+  return ''
+})
+
+const stressFillClass = computed(() => {
+  if (props.trainee.stress >= stressBreakdown) return 'fill-danger'
+  if (props.trainee.stress >= stressHigh) return 'fill-warning'
+  return 'fill-stress'
+})
+
+const stressTextClass = computed(() => {
+  if (props.trainee.stress >= stressBreakdown) return 'text-danger'
+  if (props.trainee.stress >= stressHigh) return 'text-warning'
+  return ''
+})
 </script>
 
 <style scoped>
 .trainee-card {
   padding: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
-.trainee-card.debuted { border-color: var(--accent); }
-.trainee-card.left { opacity: 0.5; }
-.trainee-card.ill { border-color: var(--warning); }
+.trainee-card.debuted {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), var(--shadow);
+}
+
+.trainee-card.left {
+  opacity: 0.5;
+}
+
+.trainee-card.ill {
+  border-color: var(--warning);
+  background: var(--warning-soft);
+}
 
 .card-top {
   display: flex;
@@ -86,10 +137,18 @@ const statusClass = computed(() => ({
   padding: 0.15rem 0.5rem;
   border-radius: 999px;
   background: var(--bg-secondary);
+  font-weight: 600;
 }
 
-.badge.debuted { background: var(--accent-soft); color: var(--accent); }
-.badge.left { background: var(--danger-soft); color: var(--danger); }
+.badge.debuted {
+  background: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.badge.left {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
 
 .bars { margin-bottom: 0.75rem; }
 
@@ -102,19 +161,39 @@ const statusClass = computed(() => ({
 }
 
 .bar-row span:first-child { width: 28px; color: var(--text-muted); }
-.bar-row span:last-child { width: 24px; text-align: right; }
+.bar-row span:last-child {
+  width: 24px;
+  text-align: right;
+  font-weight: 600;
+}
 
 .bar {
   flex: 1;
-  height: 6px;
+  height: 8px;
   background: var(--bg-secondary);
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-.fill.fatigue { background: var(--warning); }
-.fill.stress { background: var(--danger); }
+.bar.bar-warning {
+  box-shadow: 0 0 8px var(--warning-glow);
+}
+
+.bar.bar-danger {
+  box-shadow: 0 0 8px var(--danger-glow);
+}
+
+.fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.fill-fatigue { background: var(--warning); }
+.fill-stress { background: var(--danger); }
+.fill-warning { background: var(--warning-strong); }
+.fill-danger { background: var(--danger-strong); }
 
 .stats-grid {
   display: grid;
@@ -127,6 +206,16 @@ const statusClass = computed(() => ({
   background: var(--bg-secondary);
   border-radius: 6px;
   padding: 0.3rem 0.1rem;
+  transition: all 0.2s ease;
+}
+
+.stat-cell.stat-highlight {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+}
+
+.stat-cell.stat-highlight .stat-val {
+  color: var(--accent);
 }
 
 .stat-label { display: block; font-size: 0.65rem; color: var(--text-muted); }
@@ -138,15 +227,21 @@ const statusClass = computed(() => ({
   color: var(--text-secondary);
 }
 
+.score strong {
+  font-size: 1rem;
+}
+
 .debut-hint {
   margin-left: 0.5rem;
   font-size: 0.75rem;
   color: var(--accent);
+  font-weight: 600;
 }
 
 .illness, .fans {
   margin-top: 0.35rem;
   font-size: 0.8rem;
   color: var(--warning);
+  font-weight: 500;
 }
 </style>

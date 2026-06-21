@@ -74,12 +74,17 @@ const config = GAME_CONFIG
 }
 
 .save-header h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
   color: var(--text-secondary);
+  font-size: 1rem;
 }
 
 .theme-btn {
@@ -87,17 +92,25 @@ const config = GAME_CONFIG
   top: 0;
   right: 0;
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  font-size: 1.2rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.3rem;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.theme-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: rotate(15deg) scale(1.05);
 }
 
 .slots {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -107,16 +120,31 @@ const config = GAME_CONFIG
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.25rem;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.slot-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-strong);
 }
 
 .slot-card.empty {
   border-style: dashed;
+  border-color: var(--border);
   opacity: 0.85;
+}
+
+.slot-card.empty:hover {
+  border-color: var(--accent);
 }
 
 .slot-num {
   font-weight: 700;
   margin-bottom: 0.75rem;
+  color: var(--accent);
+  font-size: 1.05rem;
 }
 
 .slot-info {
@@ -126,6 +154,20 @@ const config = GAME_CONFIG
   font-size: 0.9rem;
   color: var(--text-secondary);
   margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.slot-info span {
+  display: flex;
+  justify-content: space-between;
+}
+
+.slot-info span::before {
+  content: attr(data-label);
+  color: var(--text-muted);
+  font-size: 0.8rem;
 }
 
 .slot-actions {
@@ -133,18 +175,42 @@ const config = GAME_CONFIG
   gap: 0.5rem;
 }
 
+.slot-actions .btn {
+  flex: 1;
+}
+
 .empty-text {
   color: var(--text-muted);
   margin-bottom: 1rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.rules-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
 .rules-panel h3 {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-size: 1.2rem;
 }
 
 .rules-panel ul {
-  padding-left: 1.25rem;
-  line-height: 1.8;
+  padding-left: 1.5rem;
+  line-height: 2;
   color: var(--text-secondary);
+}
+
+.rules-panel li {
+  margin-bottom: 0.25rem;
+  position: relative;
+}
+
+.rules-panel li::marker {
+  color: var(--accent);
 }
 </style>

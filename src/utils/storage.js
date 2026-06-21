@@ -34,7 +34,9 @@ export function deleteSlot(slotIndex) {
 }
 
 export function loadTheme() {
-  return localStorage.getItem(themeKey) || 'light'
+  const saved = localStorage.getItem(themeKey)
+  if (saved) return saved
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
 export function saveTheme(theme) {

@@ -85,6 +85,13 @@ const schedulable = computed(() =>
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.schedule-row:hover {
+  background: var(--bg-secondary);
 }
 
 .name {
@@ -99,31 +106,54 @@ const schedulable = computed(() =>
 }
 
 .act-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
   background: var(--bg-secondary);
   cursor: pointer;
   font-size: 1rem;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
-.act-btn:hover { border-color: var(--accent); }
+.act-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
 .act-btn.active {
   background: var(--accent-soft);
   border-color: var(--accent);
-  transform: scale(1.1);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 2px var(--accent-glow);
 }
 
 .chosen {
   font-size: 0.8rem;
   color: var(--accent);
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  background: var(--accent-soft);
+  border-radius: 6px;
 }
 
 .ill-tag {
   font-size: 0.8rem;
   color: var(--warning);
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  background: var(--warning-soft);
+  border-radius: 6px;
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--warning-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+  }
 }
 
 .legend {
@@ -133,6 +163,15 @@ const schedulable = computed(() =>
   font-size: 0.75rem;
   color: var(--text-muted);
   margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .actions {
@@ -146,5 +185,6 @@ const schedulable = computed(() =>
   font-size: 0.8rem;
   color: var(--warning);
   margin-top: 0.5rem;
+  font-weight: 500;
 }
 </style>
